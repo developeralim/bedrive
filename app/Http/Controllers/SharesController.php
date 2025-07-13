@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\FileEntrySharedNotif;
 use App\Services\Shares\AttachUsersToEntry;
 use App\Services\Shares\DetachUsersFromEntries;
+use Carbon\Carbon;
 use Common\Core\BaseController;
 use Common\Files\Traits\ChunksChildEntries;
 use Common\Validation\Validators\EmailsAreValid;
@@ -16,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class SharesController extends BaseController
@@ -76,11 +78,17 @@ class SharesController extends BaseController
             request('permissions'),
         );
 
-        if (settings('drive.send_share_notification')) {
+        if (true) {
             try {
+                $notification = new FileEntrySharedNotif([$fileEntry->id], Auth::user());
+                if( request()->scheduledAt ) {
+                    $scheduledAt = Carbon::parse(request('scheduledAt'));
+                    $notification->delay( $scheduledAt )->onQueue('notification');
+                }
+
                 Notification::send(
                     $sharees,
-                    new FileEntrySharedNotif([$fileEntry->id], Auth::user()),
+                    $notification,
                 );
             } catch (Exception $e) {
                 report($e);

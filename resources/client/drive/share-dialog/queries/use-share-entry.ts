@@ -12,6 +12,7 @@ export interface ShareEntryPayload {
   emails: string[];
   permissions: DriveEntryPermissions;
   entryId: number;
+  scheduledAt : string
 }
 
 function shareEntry({
