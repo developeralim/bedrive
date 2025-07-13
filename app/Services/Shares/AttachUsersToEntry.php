@@ -2,6 +2,7 @@
 
 namespace App\Services\Shares;
 
+use App\Models\FileEntry;
 use App\Models\User;
 use App\Services\Shares\Traits\AttachesFileEntriesToUsers;
 use App\Services\Shares\Traits\GeneratesSharePermissions;
@@ -19,7 +20,10 @@ class AttachUsersToEntry
         array $entries,
         array $permissions,
     ): Collection {
-        $users = User::whereIn('email', $emails)->get();
+        $entries = array_map(function( $entry ){
+            return FileEntry::find($entry);
+        },$entries);
+        $users   = User::whereIn('email', $emails)->get();
 
         // permissions on each user are expected
         $transformedUsers = $users->map(

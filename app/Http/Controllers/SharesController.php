@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\AttachUsersToEntriesJob;
 use App\Models\FileEntry;
 use App\Models\ShareableLink;
 use App\Models\User;
@@ -50,7 +51,7 @@ class SharesController extends BaseController
 
     public function addUsers(
         FileEntry $fileEntry,
-        AttachUsersToEntry $action,
+        AttachUsersToEntry $action
     ): JsonResponse {
         $shareeEmails = request('emails');
 
@@ -72,28 +73,32 @@ class SharesController extends BaseController
             $messages,
         );
 
-        $sharees = $action->execute(
+
+        $job = new AttachUsersToEntriesJob(
             $shareeEmails,
-            [$fileEntry],
+            [$fileEntry->id],
             request('permissions'),
+            auth()->id()
         );
 
-        if (true) {
+        if (request()->scheduledAt) {
             try {
-                $notification = new FileEntrySharedNotif([$fileEntry->id], Auth::user());
-                if( request()->scheduledAt ) {
-                    $scheduledAt = Carbon::parse(request('scheduledAt'));
-                    $notification->delay( $scheduledAt )->onQueue('notification');
+                $scheduledAt = Carbon::parse(request('scheduledAt'));
+
+                if ($scheduledAt->isPast()) {
+                    throw new \InvalidArgumentException('Scheduled time must be in the future');
                 }
 
-                Notification::send(
-                    $sharees,
-                    $notification,
-                );
-            } catch (Exception $e) {
+                $job->delay($scheduledAt);
+
+            } catch (\Exception $e) {
                 report($e);
             }
         }
+
+        $job->onConnection(config('queue.default'));
+
+        dispatch($job);
 
         return $this->success(['users' => $fileEntry->users]);
     }
