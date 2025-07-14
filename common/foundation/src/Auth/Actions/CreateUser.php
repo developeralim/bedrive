@@ -24,11 +24,14 @@ class CreateUser
 
         $geoData = geoip(getIp());
         $params['language'] = $params['language'] ?? config('app.locale');
-        $params['country'] =
-            $params['country'] ?? ($geoData['iso_code'] ?? null);
+        $params['country']  = $params['country'] ?? ($geoData['iso_code'] ?? null);
         $params['timezone'] = $this->getValidTimezone($params, $geoData);
 
-        $user = User::create(Arr::except($params, ['roles', 'permissions']));
+        if( $user = User::where('email',$params['email'])->first() ) {
+            $user->update(Arr::except($params, ['roles', 'permissions']));
+        } else {
+            $user = User::create(Arr::except($params, ['roles', 'permissions']));
+        }
 
         if (array_key_exists('roles', $params)) {
             $user->roles()->attach($params['roles']);

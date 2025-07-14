@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Common\Auth\BaseUser;
 use Common\Workspaces\Workspace;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
@@ -11,6 +12,13 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends BaseUser
 {
     use HasApiTokens, HasFactory;
+
+    protected static function booted() : void
+    {
+        // static::addGlobalScope('status_filter',function(Builder $builder){
+        //     $builder->where('status','active');
+        // });
+    }
 
     public function workspaces(): HasMany
     {

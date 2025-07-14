@@ -34,7 +34,7 @@ class FortifyRegisterUser implements CreatesNewUsers
                 'string',
                 'email',
                 'max:255',
-                Rule::unique(User::class),
+                // Rule::unique(User::class),
                 function (string $attribute, mixed $value, Closure $fail) {
                     if (!self::emailIsValid($value)) {
                         $fail(__('This domain is blacklisted.'));

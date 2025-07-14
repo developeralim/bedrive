@@ -66,7 +66,25 @@ class SharesController extends BaseController
 
         request()->validate(
             [
-                'emails' => ['required', 'min:1', new EmailsAreValid()],
+                'emails' => ['required', 'min:1',function($attribute, $value, $fail){
+                    if (!is_array($value)) {
+                        $fail("The $attribute must be an array.");
+                        return;
+                    }
+                    foreach ($value as $email) {
+                        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                            $fail("The email $email is invalid.");
+                            continue;
+                        }
+
+                        $user = User::firstOrCreate([
+                            'email'  => $email,
+                        ]);
+
+                        $user->status = 'pending';
+                        $user->save();
+                    }
+                }],
                 'permissions' => 'required|array',
             ],
             [],
