@@ -12,6 +12,7 @@ use App\Services\Shares\DetachUsersFromEntries;
 use Carbon\Carbon;
 use Common\Core\BaseController;
 use Common\Files\Traits\ChunksChildEntries;
+use Common\Notifications\NotificationSubscription;
 use Common\Validation\Validators\EmailsAreValid;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -83,6 +84,20 @@ class SharesController extends BaseController
 
                         $user->status = 'pending';
                         $user->save();
+
+                        $notificationSubscription = $user->notificationSubscriptions()->where('notif_id',FileEntrySharedNotif::NOTIF_ID)->first();
+
+                        if( ! $notificationSubscription ) {
+                            NotificationSubscription::create([
+                                'notif_id' => FileEntrySharedNotif::NOTIF_ID,
+                                'channels' => [
+                                    'email'   => true,
+                                    'mobile'  => false,
+                                    'browser' => false
+                                ],
+                                'user_id'  => $user->id
+                            ]);
+                        }
                     }
                 }],
                 'permissions' => 'required|array',
