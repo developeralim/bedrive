@@ -17,7 +17,7 @@ trait GetsUserPreferredChannels
         if (!config('common.site.notif_subs_integrated')) {
             return ['database', 'mail'];
         }
-        
+
         $channels = [];
         if (
             $sub = $notifiable->notificationSubscriptions
@@ -39,7 +39,7 @@ trait GetsUserPreferredChannels
                 }
             }
         }
-        Log::debug($channels);
+  
         return $channels;
     }
 }
