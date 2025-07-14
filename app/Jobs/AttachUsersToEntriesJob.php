@@ -37,6 +37,7 @@ class AttachUsersToEntriesJob implements ShouldQueue
                 $notification = new FileEntrySharedNotif($this->entryIds,$sharer);
                 Notification::send($sharees,$notification);
             } catch (Exception $e) {
+                Log::debug($e->getMessage());
                 report($e);
             }
         }
