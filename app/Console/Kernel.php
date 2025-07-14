@@ -19,6 +19,8 @@ class Kernel extends ConsoleKernel
         if (config('common.site.demo')) {
             $schedule->command(CleanDemoSite::class)->daily();
         }
+
+        $schedule->command('queue:work --stop-when-empty')->everyMinute();
     }
 
     protected function commands()
