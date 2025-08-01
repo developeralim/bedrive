@@ -83,7 +83,7 @@ export function SharePanel({className, entry}: SharePanelProps) {
         <span>{trans({message:'Scheduled at'})}</span>
         <input
           type="datetime-local"
-          className="w-[180px] appearance-none rounded-md border border-gray-300 bg-white px-5 py-2 pr-10 text-black placeholder-gray-500
+          className="w-[350px] appearance-none rounded-md border border-gray-300 bg-white px-5 py-2 pr-10 text-black placeholder-gray-500
              focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500
              dark:border-gray-600 dark:bg-black dark:text-white dark:placeholder-gray-400"
           onChange={(e) => {
