@@ -10,6 +10,7 @@ interface StripeElementsFormProps {
   type: 'setupIntent' | 'subscription' | 'paymentIntent';
   submitLabel: ReactNode;
   returnUrl: string;
+  amount?: number;
 }
 export function StripeElementsForm({
   productId,
@@ -17,11 +18,13 @@ export function StripeElementsForm({
   type = 'subscription',
   submitLabel,
   returnUrl,
+  amount
 }: StripeElementsFormProps) {
   const { stripe, elements, paymentElementRef, stripeIsEnabled } = useStripe({
     type,
     productId,
     priceId,
+    amount
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

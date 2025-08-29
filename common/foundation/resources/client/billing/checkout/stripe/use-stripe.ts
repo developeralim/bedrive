@@ -112,6 +112,7 @@ function createSubscription(
 }
 
 function createPaymentIntent(amount: number): Promise<{clientSecret: string}> {
+  alert(amount);
   return apiClient
     .post('billing/stripe/create-payment-intent', {
       amount,

@@ -63,6 +63,7 @@ export function Purchase() {
               submitLabel={<Trans message="Purchase Now" />}
               type="paymentIntent"
               returnUrl={`${base_url}/checkout/stripe/done`}
+              amount={10}
             />
             <Separator />
           </Fragment>
