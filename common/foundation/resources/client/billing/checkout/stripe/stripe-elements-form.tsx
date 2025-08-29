@@ -1,13 +1,13 @@
 import clsx from 'clsx';
-import {Button} from '@ui/buttons/button';
-import {FormEventHandler, Fragment, ReactNode, useState} from 'react';
-import {useStripe} from '@common/billing/checkout/stripe/use-stripe';
-import {Skeleton} from '@ui/skeleton/skeleton';
+import { Button } from '@ui/buttons/button';
+import { FormEventHandler, Fragment, ReactNode, useState } from 'react';
+import { useStripe } from '@common/billing/checkout/stripe/use-stripe';
+import { Skeleton } from '@ui/skeleton/skeleton';
 
 interface StripeElementsFormProps {
   productId?: string | number;
   priceId?: string | number;
-  type: 'setupIntent' | 'subscription';
+  type: 'setupIntent' | 'subscription' | 'paymentIntent';
   submitLabel: ReactNode;
   returnUrl: string;
 }
@@ -18,7 +18,7 @@ export function StripeElementsForm({
   submitLabel,
   returnUrl,
 }: StripeElementsFormProps) {
-  const {stripe, elements, paymentElementRef, stripeIsEnabled} = useStripe({
+  const { stripe, elements, paymentElementRef, stripeIsEnabled } = useStripe({
     type,
     productId,
     priceId,
@@ -39,20 +39,30 @@ export function StripeElementsForm({
     setIsSubmitting(true);
 
     try {
-      const method =
-        type === 'subscription' ? 'confirmPayment' : 'confirmSetup';
-      const result = await stripe[method]({
-        elements,
-        confirmParams: {
-          return_url: returnUrl,
-        },
-      });
+      let result;
+
+      if (type === 'subscription' || type === 'paymentIntent') {
+        result = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: returnUrl,
+          },
+        });
+      } else {
+        result = await stripe.confirmSetup({
+          elements,
+          confirmParams: {
+            return_url: returnUrl,
+          },
+        });
+      }
 
       // don't show validation error as it will be shown already by stripe payment element
       if (result.error?.type !== 'validation_error' && result.error?.message) {
         setErrorMessage(result.error.message);
       }
-    } catch {}
+
+    } catch { }
 
     setIsSubmitting(false);
   };

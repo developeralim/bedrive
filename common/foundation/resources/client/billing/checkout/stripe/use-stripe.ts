@@ -7,11 +7,12 @@ import {useIsDarkMode} from '@ui/themes/use-is-dark-mode';
 import {useSettings} from '@ui/settings/use-settings';
 
 interface UseStripeProps {
-  type: 'setupIntent' | 'subscription';
+  type: 'setupIntent' | 'subscription' | 'paymentIntent';
   productId?: string | number;
   priceId?: string | number;
+  amount?: number;
 }
-export function useStripe({type, productId, priceId}: UseStripeProps) {
+export function useStripe({type, productId, priceId,amount}: UseStripeProps) {
   const {user} = useAuth();
   const isDarkMode = useIsDarkMode();
   const isInitiatedRef = useRef<boolean>(false);
@@ -39,7 +40,10 @@ export function useStripe({type, productId, priceId}: UseStripeProps) {
       // create partial subscription for clientSecret
       type === 'setupIntent'
         ? createSetupIntent()
-        : createSubscription(productId!, priceId),
+        : type === 'subscription'
+        ? createSubscription(productId!, priceId)
+        : createPaymentIntent(amount!)
+
     ]).then(([stripe, {clientSecret}]) => {
       if (stripe && paymentElementRef.current) {
         const elements = stripe.elements({
@@ -103,6 +107,14 @@ function createSubscription(
     .post('billing/stripe/create-partial-subscription', {
       product_id: productId,
       price_id: priceId,
+    })
+    .then(r => r.data);
+}
+
+function createPaymentIntent(amount: number): Promise<{clientSecret: string}> {
+  return apiClient
+    .post('billing/stripe/create-payment-intent', {
+      amount,
     })
     .then(r => r.data);
 }

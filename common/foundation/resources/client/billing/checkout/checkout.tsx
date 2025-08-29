@@ -15,6 +15,7 @@ export function Checkout() {
   const {paypalElementRef} = usePaypal({
     productId,
     priceId,
+    type: 'subscription'
   });
   const {
     base_url,

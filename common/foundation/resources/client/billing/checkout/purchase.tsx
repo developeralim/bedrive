@@ -6,17 +6,17 @@ import { StripeElementsForm } from './stripe/stripe-elements-form';
 import { Fragment } from 'react';
 import { FullPageLoader } from '@ui/progress/full-page-loader';
 import { useSettings } from '@ui/settings/use-settings';
-import { usePaypalOrder } from './paypal/use-paypal-order';
 import { useFileEntryModel } from '@common/uploads/requests/use-file-entry-model';
 import { FormattedCurrency } from '@ui/i18n/formatted-currency';
 import { message } from '@ui/i18n/message';
 import { useTrans } from '@ui/i18n/use-trans';
+import { usePaypal } from './paypal/use-paypal';
 
 export function Purchase() {
   const { entryId } = useParams();
-  const { paypalElementRef } = usePaypalOrder({
-    entryId: entryId,
-    amount: 5
+  const { paypalElementRef } = usePaypal({
+    entry_id: entryId,
+    type: 'capture'
   });
 
   const entryQuery = useFileEntryModel(entryId);
@@ -38,7 +38,7 @@ export function Purchase() {
 
   const entryModel = entry.users?.length ? entry.users[0] : null;
 
-  if( entryModel?.owns_entry || entryModel?.price === 0 ) {
+  if (entryModel?.owns_entry || entryModel?.price === 0) {
     return <Navigate to='/drive/shares' />;
   }
 
@@ -58,7 +58,14 @@ export function Purchase() {
           <Trans message="Purchse from original owner" />
         </h1>
         {stripe.enable ? (
-          <></>
+          <Fragment>
+            <StripeElementsForm
+              submitLabel={<Trans message="Purchase Now" />}
+              type="paymentIntent"
+              returnUrl={`${base_url}/checkout/stripe/done`}
+            />
+            <Separator />
+          </Fragment>
         ) : null}
         <div ref={paypalElementRef} />
       </Fragment>
@@ -86,7 +93,7 @@ export function Purchase() {
           </div>
         </div>
         <div className="mt-32 flex items-center justify-between gap-24 border-t pt-24 font-medium">
-          <div><Trans message='Billed Today'/></div>
+          <div><Trans message='Billed Today' /></div>
           <FormattedCurrency value={entryModel?.price || 0} currency='USD' />
         </div>
       </div>
