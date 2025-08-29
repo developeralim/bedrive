@@ -129,4 +129,18 @@ class Stripe implements CommonSubscriptionGatewayActions
             'card_expires' => "{$card['exp_month']}/{$card['exp_year']}",
         ]);
     }
+
+    public function createPaymentIntent(float $amount, User $user): string
+    {
+        $paymentIntent = $this->client->paymentIntents->create([
+            'amount'   => round($amount * 100),
+            'currency' => strtolower(app(Settings::class)->get('billing.currency', 'USD')),
+            'customer' => $user->stripe_id,
+            'metadata' => [
+                'user_id' => $user->id,
+            ],
+        ]);
+
+        return $paymentIntent->client_secret;
+    }
 }

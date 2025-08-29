@@ -1,6 +1,5 @@
 <?php namespace Common\Billing\Gateways\Stripe;
 
-use Auth;
 use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
 use Common\Billing\Gateways\Stripe\Stripe;
@@ -8,6 +7,7 @@ use Common\Core\BaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class StripeController extends BaseController
 {
@@ -73,5 +73,18 @@ class StripeController extends BaseController
         );
 
         return $this->success();
+    }
+
+    public function createPaymentIntent(): Response|JsonResponse
+    {
+        $data = $this->validate($this->request, [
+            'amount' => 'required|numeric|min:0.5',
+        ]);
+
+        $client_secret = $this->stripe->createPaymentIntent($data['amount'], Auth::user());
+
+        return $this->success([
+            'clientSecret' => $client_secret,
+        ]);
     }
 }

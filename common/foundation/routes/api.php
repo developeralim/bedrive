@@ -222,6 +222,9 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('billing/stripe/store-subscription-details-locally', [StripeController::class, 'storeSubscriptionDetailsLocally']);
         Route::post('billing/paypal/store-subscription-details-locally', [PaypalController::class, 'storeSubscriptionDetailsLocally']);
 
+        // PAYMENT
+        Route::post('billing/stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+
         // INVOICES
         Route::get('billing/invoices', [InvoiceController::class, 'index']);
 
