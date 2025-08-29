@@ -52,6 +52,7 @@ class FileEntry extends BaseModel
                 'users.id',
                 'image',
                 'model_type',
+                'file_entry_models.price'
             )
             ->withPivot('owner', 'permissions')
             ->withTimestamps()

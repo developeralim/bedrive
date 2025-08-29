@@ -1,12 +1,12 @@
-import {Fragment, memo} from 'react';
-import {useNumberFormatter} from '@ui/i18n/use-number-formatter';
+import { Fragment, memo } from 'react';
+import { useNumberFormatter } from '@ui/i18n/use-number-formatter';
 
 interface FormattedCurrencyProps {
   value: number;
   currency: string;
 }
 export const FormattedCurrency = memo(
-  ({value, currency}: FormattedCurrencyProps) => {
+  ({ value, currency }: FormattedCurrencyProps) => {
     const formatter = useNumberFormatter({
       style: 'currency',
       currency,

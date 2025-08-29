@@ -1,28 +1,33 @@
-import React, {useContext} from 'react';
-import {DriveEntry} from '../../files/drive-entry';
-import {driveState, useDriveStore} from '../../drive-store';
-import {mergeProps} from '@react-aria/utils';
-import {useFileViewDnd} from '../use-file-view-dnd';
-import {useViewItemActionHandler} from '../use-view-item-action-handler';
-import {BaseFileGridItem} from './base-file-grid-item';
-import {EntryActionMenuTrigger} from '../../entry-actions/entry-action-menu-trigger';
-import {IconButton} from '@ui/buttons/icon-button';
-import {MoreVertIcon} from '@ui/icons/material/MoreVert';
-import {Checkbox} from '@ui/forms/toggle/checkbox';
-import {DashboardLayoutContext} from '@common/ui/dashboard-layout/dashboard-layout-context';
-import {isCtrlOrShiftPressed} from '@ui/utils/keybinds/is-ctrl-or-shift-pressed';
-import {usePointerEvents} from '@ui/interactions/use-pointer-events';
-import {createEventHandler} from '@ui/utils/dom/create-event-handler';
+import React, { useContext } from 'react';
+import { DriveEntry } from '../../files/drive-entry';
+import { driveState, useDriveStore } from '../../drive-store';
+import { mergeProps } from '@react-aria/utils';
+import { useFileViewDnd } from '../use-file-view-dnd';
+import { useViewItemActionHandler } from '../use-view-item-action-handler';
+import { BaseFileGridItem } from './base-file-grid-item';
+import { EntryActionMenuTrigger } from '../../entry-actions/entry-action-menu-trigger';
+import { IconButton } from '@ui/buttons/icon-button';
+import { MoreVertIcon } from '@ui/icons/material/MoreVert';
+import { Checkbox } from '@ui/forms/toggle/checkbox';
+import { DashboardLayoutContext } from '@common/ui/dashboard-layout/dashboard-layout-context';
+import { isCtrlOrShiftPressed } from '@ui/utils/keybinds/is-ctrl-or-shift-pressed';
+import { usePointerEvents } from '@ui/interactions/use-pointer-events';
+import { createEventHandler } from '@ui/utils/dom/create-event-handler';
+import { message } from '@ui/i18n/message';
+import { useTrans } from '@ui/i18n/use-trans';
+import { Link, Navigate } from 'react-router';
+import { Trans } from '@ui/i18n/trans';
 
 interface FileGridItemProps {
   entry: DriveEntry;
 }
-export function FileGridItem({entry}: FileGridItemProps) {
+export function FileGridItem({ entry }: FileGridItemProps) {
+  const {trans} = useTrans();
   const isSelected = useDriveStore(s => s.selectedEntries.has(entry.id));
-  const {performViewItemAction} = useViewItemActionHandler();
-  const {isMobileMode} = useContext(DashboardLayoutContext);
+  const { performViewItemAction } = useViewItemActionHandler();
+  const { isMobileMode } = useContext(DashboardLayoutContext);
 
-  const {draggableProps, droppableProps, itemClassName, ref} =
+  const { draggableProps, droppableProps, itemClassName, ref } =
     useFileViewDnd<HTMLDivElement>(entry);
 
   const toggleEntry = () => {
@@ -49,7 +54,7 @@ export function FileGridItem({entry}: FileGridItemProps) {
     }
   };
 
-  const {domProps: pressProps} = usePointerEvents({
+  const { domProps: pressProps } = usePointerEvents({
     onLongPress: isMobileMode ? () => toggleEntry() : undefined,
     onPress: pressHandler,
   });
@@ -69,35 +74,50 @@ export function FileGridItem({entry}: FileGridItemProps) {
       if (!driveState().selectedEntries.has(entry.id)) {
         driveState().selectEntries([entry.id]);
       }
-      driveState().setContextMenuData({x: e.clientX, y: e.clientY});
+      driveState().setContextMenuData({ x: e.clientX, y: e.clientY });
     }
   };
 
   return (
-    <BaseFileGridItem
-      {...mergeProps(draggableProps, droppableProps, pressProps, {
-        onKeyDown: createEventHandler(keyboardHandler),
-      })}
-      ref={ref}
-      entry={entry}
-      isSelected={isSelected}
-      isMobileMode={!!isMobileMode}
-      tabIndex={-1}
-      onDoubleClick={e => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!isMobileMode) {
-          performViewItemAction(entry);
+    entry.premium ? (
+      <div className="relative group">
+        <BaseFileGridItem entry={entry} />
+        <Link
+          to={`/purchase/${entry.id}`}
+          className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ cursor: "pointer" }}
+        >
+          <span className="text-white font-semibold text-sm">
+            <Trans message='Purchase from original owner'/>
+          </span>
+        </Link>
+      </div>
+    ) : (
+      <BaseFileGridItem
+        {...mergeProps(draggableProps, droppableProps, pressProps, {
+          onKeyDown: createEventHandler(keyboardHandler),
+        })}
+        ref={ref}
+        isSelected={isSelected}
+        isMobileMode={!!isMobileMode}
+        tabIndex={-1}
+        onDoubleClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!isMobileMode) {
+            performViewItemAction(entry);
+          }
+        }}
+        footerAdornment={
+          isMobileMode && (
+            <FooterAdornment entry={entry} isSelected={isSelected} />
+          )
         }
-      }}
-      footerAdornment={
-        isMobileMode && (
-          <FooterAdornment entry={entry} isSelected={isSelected} />
-        )
-      }
-      onContextMenu={createEventHandler(contextMenuHandler)}
-      className={itemClassName}
-    />
+        onContextMenu={createEventHandler(contextMenuHandler)}
+        entry={entry}
+        className={itemClassName}
+      />
+    )
   );
 }
 
@@ -105,7 +125,7 @@ interface FooterProps {
   entry: DriveEntry;
   isSelected?: boolean;
 }
-function FooterAdornment({entry, isSelected}: FooterProps) {
+function FooterAdornment({ entry, isSelected }: FooterProps) {
   const anySelected = useDriveStore(s => s.selectedEntries.size);
 
   if (anySelected) {

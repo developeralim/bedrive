@@ -22,11 +22,11 @@ class DriveEntriesLoader
     public function __construct(protected array $params)
     {
         $this->setPermissionsOnEntry = app(SetPermissionsOnEntry::class);
-        $this->filters = new DatasourceFilters($params['filters'] ?? null);
-        $this->userId = (int) $this->params['userId'];
-        $this->workspaceId = app(ActiveWorkspace::class)->id ?? 0;
-        $this->params['perPage'] ??= 50;
-        $this->params['section'] = $this->params['section'] ?? 'home';
+        $this->filters               = new DatasourceFilters($params['filters'] ?? null);
+        $this->userId                = (int) $this->params['userId'];
+        $this->workspaceId           = app(ActiveWorkspace::class)->id ?? 0;
+        $this->params['perPage']   ??= 50;
+        $this->params['section']     = $this->params['section'] ?? 'home';
 
         // folders should always be first
         $this->builder = FileEntry::where('public', false)
@@ -218,7 +218,14 @@ class DriveEntriesLoader
             $this->builder->where('workspace_id', $this->workspaceId);
         }
 
-        $this->builder->sharedWithUserOnly($this->userId);
+        $this->builder
+            ->sharedWithUserOnly($this->userId)
+            ->withExists([
+                'users as premium' => function($query){
+                    $query->where('model_id', $this->userId)->where('premium', 1);
+                },
+            ]);
+
         return $this->loadEntries();
     }
 

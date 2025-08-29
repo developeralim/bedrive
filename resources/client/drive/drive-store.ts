@@ -1,15 +1,15 @@
-import {enableMapSet} from 'immer';
-import {create} from 'zustand';
-import {immer} from 'zustand/middleware/immer';
-import type {DrivePage} from './drive-page/drive-page';
-import {Key} from 'react';
-import {DriveEntry} from './files/drive-entry';
-import {SortColumn, SortDirection} from './layout/sorting/available-sorts';
+import { enableMapSet } from 'immer';
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import type { DrivePage } from './drive-page/drive-page';
+import { Key } from 'react';
+import { DriveEntry } from './files/drive-entry';
+import { SortColumn, SortDirection } from './layout/sorting/available-sorts';
 import {
   getFromLocalStorage,
   setInLocalStorage,
 } from '@ui/utils/hooks/local-storage';
-import {getBootstrapData} from '@ui/bootstrap-data/bootstrap-data-store';
+import { getBootstrapData } from '@ui/bootstrap-data/bootstrap-data-store';
 
 const stableArray: DriveEntry[] = [];
 enableMapSet();
@@ -46,7 +46,7 @@ interface State {
   entriesBeingDragged: number[];
   viewMode: 'grid' | 'list';
   sortDescriptor: DriveSortDescriptor;
-  contextMenuData: {x: number; y: number; entry?: DriveEntry} | null;
+  contextMenuData: { x: number; y: number; entry?: DriveEntry } | null;
 }
 
 interface Actions {
@@ -63,7 +63,7 @@ interface Actions {
   setViewMode: (mode: 'grid' | 'list') => void;
   setSortDescriptor: (value: DriveSortDescriptor) => void;
   setContextMenuData: (
-    position: {x: number; y: number; entry?: DriveEntry} | null,
+    position: { x: number; y: number; entry?: DriveEntry } | null,
   ) => void;
   setEntriesBeingDragged: (value: number[]) => void;
   selectEntries: (
@@ -144,7 +144,7 @@ export const useDriveStore = create<State & Actions>()(
         const current = get().activeActionDialog;
         // prevent creating a new object, if neither name nor entries changed
         if (current?.name !== name || current.entries !== entries) {
-          state.activeActionDialog = name ? {name, entries} : null;
+          state.activeActionDialog = name ? { name, entries } : null;
         }
       });
     },

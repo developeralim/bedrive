@@ -1,4 +1,4 @@
-import {defineConfig, Plugin} from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import laravel from 'laravel-vite-plugin';
 import replace from '@rollup/plugin-replace';
@@ -22,7 +22,7 @@ export default defineConfig({
   base: '',
   resolve: {
     preserveSymlinks: true,
-    alias : {
+    alias: {
       '@common': path.resolve(__dirname, 'common/foundation/resources/client'),
       '@app': path.resolve(__dirname, 'resources/client'),
       '@ui': path.resolve(__dirname, 'common/foundation/resources/client/ui/library'),
@@ -47,8 +47,11 @@ export default defineConfig({
       __SENTRY_DEBUG__: false,
     }),
   ],
-  server : {
+  server: {
     host: 'localhost',
     port: 5173,
-  }
+    hmr: {
+      host: 'localhost',
+    },
+  },
 });

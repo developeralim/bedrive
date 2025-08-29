@@ -9,6 +9,7 @@ export interface DriveEntry extends FileEntry {
     'files.delete': boolean;
     'files.download': boolean;
   };
+
 }
 
 export interface DriveFolder extends DriveEntry {
@@ -23,6 +24,7 @@ export interface DriveEntryUser {
   image?: string;
   owns_entry: boolean;
   entry_permissions: DriveEntryPermissions;
+  price:number;
 }
 
 export interface DriveEntryPermissions {

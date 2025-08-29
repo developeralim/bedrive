@@ -21,5 +21,6 @@ export interface FileEntry {
   created_at?: string;
   updated_at?: string;
   children?: FileEntry[];
-  users?: {id: number; email: string; owns_entry?: boolean}[];
+  users?: {id: number; email: string; owns_entry?: boolean;price:number}[];
+  premium?:boolean;
 }

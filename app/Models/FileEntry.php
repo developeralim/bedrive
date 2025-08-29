@@ -6,6 +6,7 @@ use Common\Files\FileEntry as CommonFileEntry;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 class FileEntry extends CommonFileEntry
 {

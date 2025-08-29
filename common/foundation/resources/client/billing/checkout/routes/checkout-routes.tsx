@@ -1,5 +1,5 @@
-import {RouteObject} from 'react-router';
-import {notSubscribedGuard} from '@common/auth/guards/not-subscribed-route';
+import { RouteObject } from 'react-router';
+import { notSubscribedGuard } from '@common/auth/guards/not-subscribed-route';
 
 const lazyRoute = async (
   cmp: keyof typeof import('@common/billing/checkout/routes/checkout-routes.lazy'),
@@ -27,5 +27,10 @@ export const checkoutRoutes: RouteObject[] = [
     path: 'checkout/:productId/:priceId/paypal/done',
     loader: () => notSubscribedGuard(),
     lazy: () => lazyRoute('CheckoutPaypalDone'),
+  },
+  {
+    path: 'purchase/:entryId',
+    loader: () => notSubscribedGuard(),
+    lazy: () => lazyRoute('Purchase'),
   },
 ];
