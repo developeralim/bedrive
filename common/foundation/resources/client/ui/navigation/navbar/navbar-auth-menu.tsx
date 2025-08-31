@@ -17,6 +17,7 @@ import {DarkModeIcon} from '@ui/icons/material/DarkMode';
 import {LightModeIcon} from '@ui/icons/material/LightMode';
 import {ExitToAppIcon} from '@ui/icons/material/ExitToApp';
 import {Placement} from '@floating-ui/react-dom';
+import { EuroSymbolIcon } from '@ui/icons/material/EuroSymbol';
 
 interface Props {
   children: ReactElement;
@@ -120,6 +121,15 @@ export function NavbarAuthMenu({children, items, placement}: Props) {
             <Trans message="Light mode" />
           </MenuItem>
         )}
+        <MenuItem
+          value="earnings"
+          startIcon={<EuroSymbolIcon />}
+          onSelected={() => {
+            navigate('/earnings');
+          }}
+        >
+          <Trans message="Earnings" />
+        </MenuItem>
         <MenuItem
           value="logout"
           startIcon={<ExitToAppIcon />}

@@ -1,5 +1,8 @@
 <?php namespace Common\Billing\Gateways\Paypal;
 
+use App\Models\FileEntry;
+use App\Models\Transaction;
+use App\Models\User;
 use Common\Billing\Gateways\Contracts\CommonSubscriptionGatewayActions;
 use Common\Billing\Gateways\Paypal\PaypalPlans;
 use Common\Billing\Gateways\Paypal\PaypalSubscriptions;
@@ -8,6 +11,8 @@ use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
 use Common\Billing\Gateways\Paypal\InteractsWithPaypalRestApi;
 use Common\Settings\Settings;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Paypal implements CommonSubscriptionGatewayActions
 {
@@ -69,5 +74,43 @@ class Paypal implements CommonSubscriptionGatewayActions
         array $gatewayParams = [],
     ): bool {
         return $this->subscriptions->resume($subscription, $gatewayParams);
+    }
+
+    public function storePurchaseDetails(string $orderId,User $user,int $entryId )
+    {
+        $response = $this->paypal()->get("checkout/orders/$orderId");
+
+        if ($response->status() !== 200) {
+            throw new \Exception('Could not retrieve PayPal order details.');
+        }
+
+        $order = $response->json();
+
+        if ($order['status'] !== 'COMPLETED') {
+            throw new \Exception('PayPal order is not completed.');
+        }
+
+        $entry_model = DB::table('file_entry_models')->where([
+            'file_entry_id' => $entryId,
+            'model_type'    => 'user',
+            'model_id'      => Auth::id(),
+        ])->first();
+
+        $file_entry = FileEntry::find($entryId);
+
+        Transaction::create([
+            'user_id'           => $file_entry->owner_id,
+            'payment_processor' => 'paypal',
+            'transaction_id'    => $orderId,
+            'amount'            => $order['purchase_units'][0]['amount']['value'],
+            'currency'          => $order['purchase_units'][0]['amount']['currency_code'],
+            'status'            => $order['status'],
+        ]);
+
+        if( $entry_model && $owner = $file_entry->owner ) {
+            $entry_model->update(['paid' => true]);
+            $owner->balance += $entry_model->price;
+            $owner->save();
+        }
     }
 }

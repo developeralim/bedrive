@@ -4,9 +4,9 @@ import {AccountSettingsPage} from './ui/account-settings/account-settings-page';
 import {GuestRoute} from './guards/guest-route';
 import {ForgotPasswordPage} from './ui/forgot-password-page';
 import {ResetPasswordPage} from './ui/reset-password-page';
-import React from 'react';
 import {RouteObject} from 'react-router';
 import {LoginPageWrapper} from '@common/auth/ui/login-page-wrapper';
+import { EarningsPage } from './ui/earnings/earnings-page';
 
 export const authRoutes: RouteObject[] = [
   {
@@ -62,6 +62,14 @@ export const authRoutes: RouteObject[] = [
     element: (
       <AuthRoute>
         <AccountSettingsPage />
+      </AuthRoute>
+    ),
+  },
+  {
+    path: '/earnings',
+    element: (
+      <AuthRoute>
+        <EarningsPage />
       </AuthRoute>
     ),
   },

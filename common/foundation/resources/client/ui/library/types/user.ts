@@ -8,6 +8,8 @@ export interface User {
   language?: string;
   timezone?: string;
   country?: string;
+  stripe_account_id?:string;
+  balance:number;
 }
 
 export interface CompactUser {

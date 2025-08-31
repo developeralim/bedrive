@@ -1,16 +1,16 @@
-import {CheckoutLayout} from '../checkout-layout';
-import {useParams, useSearchParams} from 'react-router';
-import {useEffect, useRef, useState} from 'react';
-import {message} from '@ui/i18n/message';
-import {CheckoutProductSummary} from '../checkout-product-summary';
+import { CheckoutLayout } from '../checkout-layout';
+import { useParams, useSearchParams } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { message } from '@ui/i18n/message';
+import { CheckoutProductSummary } from '../checkout-product-summary';
 import {
   BillingRedirectMessage,
   BillingRedirectMessageConfig,
 } from '../../billing-redirect-message';
-import {apiClient} from '@common/http/query-client';
+import { apiClient } from '@common/http/query-client';
 
 export function CheckoutPaypalDone() {
-  const {productId, priceId} = useParams();
+  const { productId, priceId,entry_id:entryId } = useParams();
   const [params] = useSearchParams();
   const alreadyStoredLocally = useRef(false);
 
@@ -19,7 +19,8 @@ export function CheckoutPaypalDone() {
 
   useEffect(() => {
     const subscriptionId = params.get('subscriptionId');
-    const status = params.get('status');
+    const orderId        = params.get('orderId');
+    const status         = params.get('status');
 
     if (alreadyStoredLocally.current) {
       return;
@@ -32,11 +33,18 @@ export function CheckoutPaypalDone() {
         );
         window.location.href = '/billing';
       });
+    } else if(orderId && status === 'success' && entryId){
+      storePurchaseDetailsLocally(orderId).then(() => {
+        setMessageConfig(
+          getRedirectMessageConfig('purchase_success', entryId),
+        );
+        window.location.href = 'drive/shares';
+      });
     } else {
       setMessageConfig(getRedirectMessageConfig(status, productId, priceId));
     }
     alreadyStoredLocally.current = true;
-  }, [priceId, productId, params]);
+  }, [priceId, productId, params,entryId]);
 
   return (
     <CheckoutLayout>
@@ -50,6 +58,7 @@ function getRedirectMessageConfig(
   status?: 'success' | 'error' | string | null,
   productId?: string,
   priceId?: string,
+  entryId?: string
 ): BillingRedirectMessageConfig {
   switch (status) {
     case 'success':
@@ -58,6 +67,13 @@ function getRedirectMessageConfig(
         status: 'success',
         buttonLabel: message('Return to site'),
         link: '/billing',
+      };
+    case 'purchase_success':
+      return {
+        message: message('Purchase successful!'),
+        status: 'success',
+        buttonLabel: message('Return to site'),
+        link: 'drive/shares',
       };
     default:
       return {
@@ -76,5 +92,12 @@ function errorLink(productId?: string, priceId?: string): string {
 function storeSubscriptionDetailsLocally(subscriptionId: string) {
   return apiClient.post('billing/paypal/store-subscription-details-locally', {
     paypal_subscription_id: subscriptionId,
+  });
+}
+
+function storePurchaseDetailsLocally(orderId: string,entryId?: string) {
+  return apiClient.post('billing/paypal/store-purchase-details-locally', {
+    paypal_order_id : orderId,
+    entry_id        : entryId
   });
 }

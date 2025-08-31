@@ -1,5 +1,7 @@
 <?php namespace Common\Billing\Gateways\Stripe;
 
+use App\Models\FileEntry;
+use App\Models\Transaction;
 use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
 use Common\Billing\Gateways\Stripe\Stripe;
@@ -8,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StripeController extends BaseController
 {
@@ -86,5 +89,60 @@ class StripeController extends BaseController
         return $this->success([
             'clientSecret' => $client_secret,
         ]);
+    }
+
+    public function storePurchaseDetailsLocally(): Response|JsonResponse
+    {
+        $data = $this->validate($this->request, [
+            'payment_intent_id' => 'required|string',
+        ]);
+
+        $paymentIntent = $this->stripe->client->paymentIntents->retrieve(
+            $data['payment_intent_id'],
+        );
+
+        if ($paymentIntent->status !== 'succeeded') {
+            return $this->error();
+        }
+
+        $entry_model = DB::table('file_entry_models')->where([
+            'file_entry_id' => $data['file_entry_id'],
+            'model_type'    => 'user',
+            'model_id'      => Auth::id(),
+        ])->first();
+
+        $file_entry = FileEntry::find($data['file_entry_id']);
+
+        Transaction::create([
+            'user_id'           => $file_entry->owner_id,
+            'payment_processor' => 'stripe',
+            'transaction_id'    => $paymentIntent->id,
+            'amount'            => $paymentIntent->amount,
+            'currency'          => $paymentIntent->currency,
+            'status'            => $paymentIntent->status,
+        ]);
+
+        if( $entry_model && $owner = $file_entry->owner ) {
+            $entry_model->update(['paid' => true]);
+            $owner->balance += $entry_model->price;
+            $owner->save();
+        }
+
+        return $this->success();
+    }
+
+    public function connectStripeAccount(): Response|JsonResponse
+    {
+        $accountLink = $this->stripe->createConnectAccountLink(Auth::user());
+        return $this->success(['url' => $accountLink->url]);
+    }
+
+    public function resetAccountConnect() : Response|JsonResponse
+    {
+        $user                    = Auth::user();
+        $user->stripe_account_id = null;
+        $user->save();
+
+        return $this->success();
     }
 }

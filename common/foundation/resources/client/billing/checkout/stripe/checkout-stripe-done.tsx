@@ -13,7 +13,7 @@ import {apiClient} from '@common/http/query-client';
 import {useSettings} from '@ui/settings/use-settings';
 
 export function CheckoutStripeDone() {
-  const {productId, priceId} = useParams();
+  const {productId, priceId,type,entryId} = useParams();
   const navigate = useNavigate();
   const {
     billing: {stripe_public_key},
@@ -34,9 +34,10 @@ export function CheckoutStripeDone() {
         setMessageConfig(getRedirectMessageConfig());
         return;
       }
-      stripe
-        .retrievePaymentIntent(clientSecret)
-        .then(async ({paymentIntent}) => {
+
+      const payment = stripe.retrievePaymentIntent(clientSecret)
+      if( type === 'subscription'){
+        payment.then(async ({paymentIntent}) => {
           if (paymentIntent?.status === 'succeeded') {
             await storeSubscriptionDetailsLocally(paymentIntent.id);
             setMessageConfig(
@@ -53,9 +54,29 @@ export function CheckoutStripeDone() {
             );
           }
         });
+      }
+
+      if( type === 'order'){
+        payment.then(async ({paymentIntent}) => {
+          if (paymentIntent?.status === 'succeeded') {
+            await storePurchaseDetailsLocally(paymentIntent.id,entryId);
+            setMessageConfig(
+              getRedirectMessageConfig('purchased_succeeded', entryId),
+            );
+            window.location.href = '/billing';
+          } else {
+            setMessageConfig(
+              getRedirectMessageConfig(
+                paymentIntent?.status,
+                entryId
+              ),
+            );
+          }
+        });
+      }
     });
     stripeInitiated.current = true;
-  }, [stripe_public_key, clientSecret, priceId, productId]);
+  }, [stripe_public_key, clientSecret, priceId, productId,entryId,type]);
 
   if (!clientSecret) {
     navigate('/');
@@ -74,6 +95,7 @@ function getRedirectMessageConfig(
   status?: PaymentIntent.Status,
   productId?: string,
   priceId?: string,
+  entryId?: string,
 ): BillingRedirectMessageConfig {
   switch (status) {
     case 'succeeded':
@@ -81,7 +103,7 @@ function getRedirectMessageConfig(
         message: message('Subscription successful!'),
         status: 'success',
         buttonLabel: message('Return to site'),
-        link: '/billing',
+        link: entryId ? '/drive/shares' : '/billing',
       };
     case 'processing':
       return {
@@ -90,23 +112,34 @@ function getRedirectMessageConfig(
         ),
         status: 'success',
         buttonLabel: message('Return to site'),
-        link: '/billing',
+        link: entryId ? '/drive/shares' : '/billing',
       };
     case 'requires_payment_method':
       return {
         message: message('Payment failed. Please try another payment method.'),
         status: 'error',
         buttonLabel: message('Go back'),
-        link: errorLink(productId, priceId),
+        link: entryId ? purchaseErrorLink(entryId) : errorLink(productId, priceId),
+      };
+    case 'purchased_succeeded':
+      return {
+        message: message('Payment failed. Please try another payment method.'),
+        status: 'error',
+        buttonLabel: message('Go back'),
+        link: purchaseErrorLink(entryId),
       };
     default:
       return {
         message: message('Something went wrong'),
         status: 'error',
         buttonLabel: message('Go back'),
-        link: errorLink(productId, priceId),
+        link: entryId ? purchaseErrorLink(entryId) : errorLink(productId, priceId),
       };
   }
+}
+
+function purchaseErrorLink(entryId?: string): string {
+  return entryId ? `/purchase/${entryId}` : '/';
 }
 
 function errorLink(productId?: string, priceId?: string): string {
@@ -116,5 +149,12 @@ function errorLink(productId?: string, priceId?: string): string {
 function storeSubscriptionDetailsLocally(paymentIntentId: string) {
   return apiClient.post('billing/stripe/store-subscription-details-locally', {
     payment_intent_id: paymentIntentId,
+  });
+}
+
+function storePurchaseDetailsLocally(paymentIntentId: string,entryId?: string) {
+  return apiClient.post('billing/stripe/store-purchase-details-locally', {
+    payment_intent_id: paymentIntentId,
+    entry_id: entryId
   });
 }

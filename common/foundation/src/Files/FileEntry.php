@@ -143,7 +143,7 @@ class FileEntry extends BaseModel
 
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'owner_id');
     }
 
     /**

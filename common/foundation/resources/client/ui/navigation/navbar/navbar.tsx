@@ -81,6 +81,7 @@ export function Navbar(props: NavbarProps) {
     color = darkModeColor;
   }
 
+
   return (
     <div
       style={alwaysDarkMode ? darkThemeVars : undefined}

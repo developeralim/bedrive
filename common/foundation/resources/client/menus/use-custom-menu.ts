@@ -20,7 +20,7 @@ export function useCustomMenu(menuOrPosition?: string | MenuConfig) {
         : menuOrPosition;
 
     const menuItems: MenuItemConfig[] = [];
-
+    
     if (menu) {
       for (const item of menu.items) {
         const hasRoles = (item.roles || []).every(

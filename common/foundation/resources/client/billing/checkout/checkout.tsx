@@ -49,7 +49,7 @@ export function Checkout() {
               priceId={priceId}
               submitLabel={<Trans message="Upgrade" />}
               type="subscription"
-              returnUrl={`${base_url}/checkout/${productId}/${priceId}/stripe/done`}
+              returnUrl={`${base_url}/checkout/${productId}/${priceId}/stripe/done?type=subscription`}
             />
             <Separator />
           </Fragment>

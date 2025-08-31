@@ -25,6 +25,8 @@ use Common\Billing\Gateways\SyncProductsController;
 use Common\Billing\Invoices\InvoiceController;
 use Common\Billing\Products\ProductsController;
 use Common\Billing\Subscriptions\SubscriptionsController;
+use Common\Billing\TransactionController;
+use Common\Billing\WithdrawController;
 use Common\Comments\Controllers\CommentableController;
 use Common\Comments\Controllers\CommentController;
 use Common\Core\Controllers\BootstrapController;
@@ -224,6 +226,18 @@ Route::group(['prefix' => 'v1'], function () {
 
         // PAYMENT
         Route::post('billing/stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+        Route::post('billing/stripe/store-purchase-details-locally', [StripeController::class, 'storePurchaseDetailsLocally']);
+        Route::post('billing/paypal/store-purchase-details-locally', [PaypalController::class, 'storePurchaseDetailsLocally']);
+
+        //PAYOUTS
+        Route::post('billing/stripe/connect-account-link', [StripeController::class, 'connectStripeAccount']);
+        Route::post('billing/stripe/reset-account-connect', [StripeController::class, 'resetAccountConnect']);
+
+        //TRANSACTIONS
+        Route::get('transactions',[TransactionController::class,'index']);
+
+        //WITHDRAW
+        Route::post('withdraw', [WithdrawController::class, 'withdraw']);
 
         // INVOICES
         Route::get('billing/invoices', [InvoiceController::class, 'index']);

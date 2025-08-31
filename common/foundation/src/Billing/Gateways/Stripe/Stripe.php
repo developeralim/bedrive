@@ -143,4 +143,25 @@ class Stripe implements CommonSubscriptionGatewayActions
 
         return $paymentIntent->client_secret;
     }
+
+    public function createConnectAccountLink( User $user )
+    {
+        $account = $this->client->accounts->create([
+            'type'      => 'express',
+            'country'   => 'US',
+            'email'     => $user->email,
+        ]);
+
+        $accountLink = $this->client->accountLinks->create([
+            'account'       => $account->id,
+            'refresh_url'   => url('earnings',['status' => 'refresh']),
+            'return_url'    => url('earnings'),
+            'type'          => 'account_onboarding',
+        ]);
+
+        $user->stripe_account_id = $account->id;
+        $user->save();
+
+        return $accountLink;
+    }
 }

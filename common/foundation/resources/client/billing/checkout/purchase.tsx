@@ -62,7 +62,7 @@ export function Purchase() {
             <StripeElementsForm
               submitLabel={<Trans message="Purchase Now" />}
               type="paymentIntent"
-              returnUrl={`${base_url}/checkout/stripe/done`}
+              returnUrl={`${base_url}/purchase/${entryId}/stripe/done?type=order`}
               amount={10}
             />
             <Separator />

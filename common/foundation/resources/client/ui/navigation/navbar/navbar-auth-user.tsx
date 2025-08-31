@@ -1,12 +1,12 @@
-import {useAuth} from '@common/auth/use-auth';
-import {useThemeSelector} from '@ui/themes/theme-selector-context';
-import {Badge} from '@ui/badge/badge';
-import {ButtonBase} from '@ui/buttons/button-base';
-import {ArrowDropDownIcon} from '@ui/icons/material/ArrowDropDown';
-import {ReactElement} from 'react';
-import {ListboxItemProps} from '@ui/forms/listbox/item';
-import {NavbarAuthMenu} from '@common/ui/navigation/navbar/navbar-auth-menu';
-import {UserAvatar} from '@common/auth/user-avatar';
+import { useAuth } from '@common/auth/use-auth';
+import { useThemeSelector } from '@ui/themes/theme-selector-context';
+import { Badge } from '@ui/badge/badge';
+import { ButtonBase } from '@ui/buttons/button-base';
+import { ArrowDropDownIcon } from '@ui/icons/material/ArrowDropDown';
+import { ReactElement } from 'react';
+import { ListboxItemProps } from '@ui/forms/listbox/item';
+import { NavbarAuthMenu } from '@common/ui/navigation/navbar/navbar-auth-menu';
+import { UserAvatar } from '@common/auth/user-avatar';
 
 export interface NavbarAuthUserProps {
   items?: ReactElement<ListboxItemProps>[];
@@ -20,8 +20,8 @@ export function NavbarAuthUser({
   wideAvatarSize = 'w-32 h-32',
   compactAvatarSize = 'w-26 h-26',
 }: NavbarAuthUserProps) {
-  const {user} = useAuth();
-  const {selectedTheme} = useThemeSelector();
+  const { user } = useAuth();
+  const { selectedTheme } = useThemeSelector();
   if (!selectedTheme || !user) return null;
   const hasUnreadNotif = !!user.unread_notifications_count;
 

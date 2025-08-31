@@ -31,4 +31,20 @@ class PaypalController extends BaseController
 
         return $this->success();
     }
+
+    public function storePurchaseDetailsLocally(): Response|JsonResponse
+    {
+        $data = $this->validate($this->request, [
+            'paypal_order_id'   => 'required|string',
+            'entry_id'          => 'integer|exists:entries,id',
+        ]);
+
+        $this->paypal->storePurchaseDetails(
+            $data['paypal_order_id'],
+            Auth::user(),
+            $data['entry_id']
+        );
+
+        return $this->success();
+    }
 }
