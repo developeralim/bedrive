@@ -132,6 +132,8 @@ class Stripe implements CommonSubscriptionGatewayActions
 
     public function createPaymentIntent(float $amount, User $user): string
     {
+        $this->subscriptions->syncStripeCustomer($user);
+
         $paymentIntent = $this->client->paymentIntents->create([
             'amount'   => round($amount * 100),
             'currency' => strtolower(app(Settings::class)->get('billing.currency', 'USD')),

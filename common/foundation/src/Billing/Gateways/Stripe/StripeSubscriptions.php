@@ -265,7 +265,7 @@ class StripeSubscriptions
         }
     }
 
-    protected function syncStripeCustomer(User $user): User
+    public function syncStripeCustomer(User $user): User
     {
         // make sure user with stored stripe ID actually exists on stripe
         if ($user->stripe_id) {
