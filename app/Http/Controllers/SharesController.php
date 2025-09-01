@@ -106,12 +106,13 @@ class SharesController extends BaseController
             $messages,
         );
 
-
         $job = new AttachUsersToEntriesJob(
             $shareeEmails,
             [$fileEntry->id],
             request('permissions'),
-            auth()->id()
+            auth()->id(),
+            request('premium'),
+            request('price')
         );
 
         if (request()->scheduledAt) {

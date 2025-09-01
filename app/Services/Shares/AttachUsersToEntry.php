@@ -19,6 +19,8 @@ class AttachUsersToEntry
         array $emails,
         array $entries,
         array $permissions,
+        bool $premium = false,
+        int $price = 0
     ): Collection {
         $entries = array_map(function( $entry ){
             return FileEntry::find($entry);
@@ -33,9 +35,9 @@ class AttachUsersToEntry
             ],
         );
 
-        $transformedUsers->chunk(200)->each(function ($users) use ($entries) {
-            $this->chunkChildEntries($entries, function ($chunk) use ($users) {
-                $this->attachFileEntriesToUsers($users, $chunk);
+        $transformedUsers->chunk(200)->each(function ($users) use ($entries,$premium,$price) {
+            $this->chunkChildEntries($entries, function ($chunk) use ($users,$premium,$price) {
+                $this->attachFileEntriesToUsers($users, $chunk,$premium,$price);
             });
         });
 

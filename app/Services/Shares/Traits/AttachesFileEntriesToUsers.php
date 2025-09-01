@@ -5,12 +5,15 @@ namespace App\Services\Shares\Traits;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 trait AttachesFileEntriesToUsers
 {
     protected function attachFileEntriesToUsers(
         Collection $users,
         Collection $entries,
+        bool $premium = false,
+        int $price = 0
     ): void {
         $records = $users
             ->map(
@@ -22,6 +25,8 @@ trait AttachesFileEntriesToUsers
                             ? $entry
                             : $entry->id,
                         'permissions' => json_encode($user['permissions']),
+                        'premium'    => $premium,
+                        'price'      => $premium ? $price : 0,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ],
@@ -42,7 +47,6 @@ trait AttachesFileEntriesToUsers
                 fn($b) => (int) $b->file_entry_id === (int) $a['file_entry_id'],
             ),
         );
-
         DB::table('file_entry_models')->insert($records->toArray());
     }
 }

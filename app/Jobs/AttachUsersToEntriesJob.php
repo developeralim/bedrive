@@ -23,14 +23,23 @@ class AttachUsersToEntriesJob implements ShouldQueue
         protected array $emails,
         protected array $entryIds,
         protected array $permissions,
-        protected int $sharer
+        protected int $sharer,
+        protected bool $premium,
+        protected int $price
     ) {
 
     }
 
     public function handle(AttachUsersToEntry $service)
     {
-        $sharees = $service->execute($this->emails,$this->entryIds, $this->permissions);
+        $sharees = $service->execute(
+            $this->emails,
+            $this->entryIds,
+            $this->permissions,
+            $this->premium,
+            $this->price
+        );
+
         if (settings('drive.send_share_notification')) {
             try {
                 $sharer  = User::find($this->sharer);
