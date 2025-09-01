@@ -98,18 +98,23 @@ class Paypal implements CommonSubscriptionGatewayActions
 
         $file_entry = FileEntry::find($entryId);
 
-        Transaction::create([
+        $txn = [
             'user_id'           => $file_entry->owner_id,
             'payment_processor' => 'paypal',
             'transaction_id'    => $orderId,
             'amount'            => $order['purchase_units'][0]['amount']['value'],
             'currency'          => $order['purchase_units'][0]['amount']['currency_code'],
             'status'            => $order['status'],
-        ]);
+        ];
 
         if( $entry_model && $owner = $file_entry->owner ) {
+            $price = $entry_model->price - ( $entry_model->price * settings('drive.share_percentage',0) / 100 );
+            $txn['amount'] = $price;
+
+            Transaction::create($txn);
+
             $entry_model->update(['paid' => true]);
-            $owner->balance += $entry_model->price;
+            $owner->balance += $price;
             $owner->save();
         }
     }

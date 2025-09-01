@@ -1,14 +1,14 @@
-import {Trans} from '@ui/i18n/trans';
-import {FormRadioGroup} from '@ui/forms/radio-group/radio-group';
-import {FormRadio} from '@ui/forms/radio-group/radio';
-import {FormSwitch} from '@ui/forms/toggle/switch';
+import { Trans } from '@ui/i18n/trans';
+import { FormRadioGroup } from '@ui/forms/radio-group/radio-group';
+import { FormRadio } from '@ui/forms/radio-group/radio';
+import { FormSwitch } from '@ui/forms/toggle/switch';
 import {
   AdminSettingsForm,
   AdminSettingsLayout,
 } from '@common/admin/settings/form/admin-settings-form';
-import React from 'react';
-import {AdminSettings} from '@common/admin/settings/admin-settings';
-import {useForm} from 'react-hook-form';
+import { AdminSettings } from '@common/admin/settings/admin-settings';
+import { useForm } from 'react-hook-form';
+import { FormTextField } from '@ui/forms/input-field/text-field/text-field';
 
 export function DriveSettings() {
   return (
@@ -26,14 +26,15 @@ export function DriveSettings() {
 interface FormProps {
   data: AdminSettings;
 }
-function Form({data}: FormProps) {
+
+function Form({ data }: FormProps) {
   const form = useForm<AdminSettings>({
     defaultValues: {
       client: {
         drive: {
           default_view: data.client.drive?.default_view ?? 'list',
-          send_share_notification:
-            data.client.drive?.send_share_notification ?? false,
+          send_share_notification: data.client.drive?.send_share_notification ?? false,
+          share_percentage : data.client.drive?.share_percentage ?? '10'
         },
         share: {
           suggest_emails: data.client.share?.suggest_emails ?? false,
@@ -79,6 +80,12 @@ function Form({data}: FormProps) {
       >
         <Trans message="Suggest emails" />
       </FormSwitch>
+      <FormTextField
+        name={`client.drive.share_percentage`}
+        label={<Trans message="Premium Share percentage" />}
+        className="mb-20 mt-20"
+        type='number'
+      />
     </AdminSettingsForm>
   );
 }

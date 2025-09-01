@@ -591,5 +591,6 @@ return [
     // drive
     ['name' => 'drive.default_view', 'value' => 'grid'],
     ['name' => 'drive.send_share_notification', 'value' => false],
+    ['name' => 'drive.share_percentage', 'value' => 0],
     ['name' => 'share.suggest_emails', 'value' => false],
 ];

@@ -26,6 +26,7 @@ declare module '@ui/settings/settings' {
       details_default_visibility: boolean;
       default_view: 'list' | 'grid';
       send_share_notification: boolean;
+      share_percentage:string;
     };
     share?: {
       suggest_emails: boolean;

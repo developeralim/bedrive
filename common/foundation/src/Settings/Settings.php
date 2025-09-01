@@ -27,8 +27,7 @@ class Settings
         'notif.subs.integrated' => 'common.site.notif_subs_integrated',
         'api.integrated' => 'common.site.api_integrated',
         'branding.site_name' => 'app.name',
-        'realtime.pusher_cluster' =>
-            'broadcasting.connections.pusher.options.cluster',
+        'realtime.pusher_cluster' => 'broadcasting.connections.pusher.options.cluster',
         'realtime.pusher_key' => 'broadcasting.connections.pusher.key',
         'site.hide_docs_buttons' => 'common.site.hide_docs_buttons',
         'site.has_mobile_app' => 'common.site.has_mobile_app',

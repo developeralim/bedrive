@@ -113,18 +113,23 @@ class StripeController extends BaseController
 
         $file_entry = FileEntry::find($data['file_entry_id']);
 
-        Transaction::create([
+        $txn = [
             'user_id'           => $file_entry->owner_id,
             'payment_processor' => 'stripe',
             'transaction_id'    => $paymentIntent->id,
             'amount'            => $paymentIntent->amount,
             'currency'          => $paymentIntent->currency,
             'status'            => $paymentIntent->status,
-        ]);
+        ];
 
         if( $entry_model && $owner = $file_entry->owner ) {
+            $price = $entry_model->price - ( $entry_model->price * settings('drive.share_percentage',0) / 100 );
+
+            $txn['amount'] = $price;
+            Transaction::create($txn);
+
             $entry_model->update(['paid' => true]);
-            $owner->balance += $entry_model->price;
+            $owner->balance += $price;
             $owner->save();
         }
 
