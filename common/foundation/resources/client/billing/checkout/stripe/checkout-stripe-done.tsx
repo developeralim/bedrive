@@ -22,7 +22,7 @@ export function CheckoutStripeDone() {
   const [params] = useSearchParams();
   const clientSecret = params.get('payment_intent_client_secret');
   const type         = params.get('type');
-  
+
   const [messageConfig, setMessageConfig] = useState<BillingRedirectMessageConfig>();
 
   const stripeInitiated = useRef<boolean>();
@@ -64,7 +64,7 @@ export function CheckoutStripeDone() {
             setMessageConfig(
               getRedirectMessageConfig('purchased_succeeded', entryId),
             );
-            window.location.href = '/billing';
+            //window.location.href = '/drive/shares';
           } else {
             setMessageConfig(
               getRedirectMessageConfig(
