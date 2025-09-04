@@ -106,12 +106,12 @@ class StripeController extends BaseController
         }
 
         $entry_model = DB::table('file_entry_models')->where([
-            'file_entry_id' => $data['file_entry_id'],
+            'file_entry_id' => $data['entry_id'],
             'model_type'    => 'user',
             'model_id'      => Auth::id(),
         ])->first();
 
-        $file_entry = FileEntry::find($data['file_entry_id']);
+        $file_entry = FileEntry::find($data['entry_id']);
 
         $txn = [
             'user_id'           => $file_entry->owner_id,
