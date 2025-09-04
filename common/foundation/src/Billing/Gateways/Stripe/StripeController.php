@@ -95,8 +95,9 @@ class StripeController extends BaseController
     {
         $data = $this->validate($this->request, [
             'payment_intent_id' => 'required|string',
+            'entry_id'          => 'required|string|exists:file_entries,id'
         ]);
-
+        
         $paymentIntent = $this->stripe->client->paymentIntents->retrieve(
             $data['payment_intent_id'],
         );
