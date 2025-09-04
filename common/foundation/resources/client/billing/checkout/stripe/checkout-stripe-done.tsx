@@ -113,7 +113,7 @@ function getRedirectMessageConfig(
         ),
         status: 'success',
         buttonLabel: message('Return to site'),
-        link: entryId ? '/drive/shares' : '/billing',
+        link: '/billing',
       };
     case 'requires_payment_method':
       return {

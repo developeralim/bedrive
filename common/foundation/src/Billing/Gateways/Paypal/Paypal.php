@@ -113,7 +113,10 @@ class Paypal implements CommonSubscriptionGatewayActions
 
             Transaction::create($txn);
 
-            $entry_model->update(['paid' => true]);
+            DB::table('file_entry_models')->where('id',$entry_model->id)->update([
+                'paid' => true
+            ]);
+
             $owner->balance += $price;
             $owner->save();
         }
