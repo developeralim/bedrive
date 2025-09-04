@@ -5,6 +5,7 @@ namespace Common\Billing;
 use App\Models\Transaction;
 use Common\Core\BaseController;
 use Common\Database\Datasource\Datasource;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends BaseController
 {
@@ -12,7 +13,7 @@ class TransactionController extends BaseController
     {
         // $this->authorize('index', Transaction::class);
 
-        $builder = Transaction::query();
+        $builder = Auth::user()->transactions();
 
         $dataSource = new Datasource($builder, request()->all());
 

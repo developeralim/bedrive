@@ -1,5 +1,6 @@
 <?php namespace Common\Auth;
 
+use App\Models\Transaction;
 use App\Models\User;
 use Common\Auth\Notifications\VerifyEmailWithOtp;
 use Common\Auth\Permissions\Permission;
@@ -476,5 +477,10 @@ abstract class BaseUser extends BaseModel implements
     public static function getModelTypeAttribute(): string
     {
         return static::MODEL_TYPE;
+    }
+
+    public function transactions() : HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }
