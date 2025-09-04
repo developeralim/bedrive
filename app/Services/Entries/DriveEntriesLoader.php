@@ -222,7 +222,7 @@ class DriveEntriesLoader
             ->sharedWithUserOnly($this->userId)
             ->withExists([
                 'users as premium' => function($query){
-                    $query->where('model_id', $this->userId)->where('premium', 1);
+                    $query->where('model_id', $this->userId)->where('premium', true)->where('paid',false);
                 },
             ]);
 
