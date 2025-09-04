@@ -8,8 +8,6 @@ import { FullPageLoader } from '@ui/progress/full-page-loader';
 import { useSettings } from '@ui/settings/use-settings';
 import { useFileEntryModel } from '@common/uploads/requests/use-file-entry-model';
 import { FormattedCurrency } from '@ui/i18n/formatted-currency';
-import { message } from '@ui/i18n/message';
-import { useTrans } from '@ui/i18n/use-trans';
 import { usePaypal } from './paypal/use-paypal';
 
 export function Purchase() {
@@ -63,7 +61,7 @@ export function Purchase() {
               submitLabel={<Trans message="Purchase Now" />}
               type="paymentIntent"
               returnUrl={`${base_url}/purchase/${entryId}/stripe/done?type=order`}
-              amount={10}
+              amount={entryModel?.price}
             />
             <Separator />
           </Fragment>

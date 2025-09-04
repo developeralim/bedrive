@@ -14,6 +14,7 @@ interface Props {
     hash: string;
     file_name: string;
     url?: string;
+    premium? : boolean;
   };
   className?: string;
   iconClassName?: string;
@@ -40,7 +41,7 @@ export function FileThumbnail({
     });
     return (
       <img
-        className={clsx(className, 'object-cover')}
+        className={clsx(className, 'object-cover', file.premium &&  'blur-md')}
         src={previewUrl}
         alt={alt}
         draggable={false}

@@ -17,6 +17,7 @@ class FileResponseFactory
         FileEntry $entry,
         string $disposition = 'inline',
     ): mixed {
+
         $options = [
             'useThumbnail' => Request::get('thumbnail') && $entry->thumbnail,
             'disposition' => $disposition,

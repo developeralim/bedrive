@@ -74,8 +74,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['middleware' => ['optionalAuth:sanctum', 'verified', 'verifyApiAccess']], function () {
         // FILE ENTRIES
         Route::get('file-entries/{fileEntry}/model', [FileEntriesController::class, 'showModel']);
-        Route::get('file-entries/{fileEntry}', [FileEntriesController::class, 'show'])
-          ->withoutMiddleware(VerifyApiAccessMiddleware::class);
+        Route::get('file-entries/{fileEntry}', [FileEntriesController::class, 'show'])->withoutMiddleware(VerifyApiAccessMiddleware::class);
         Route::get('file-entries', [FileEntriesController::class, 'index']);
         Route::post('file-entries/delete', [FileEntriesController::class, 'destroy']);
         Route::delete('file-entries/{entryIds}', [FileEntriesController::class, 'destroy']);

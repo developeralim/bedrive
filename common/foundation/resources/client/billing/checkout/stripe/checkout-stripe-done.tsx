@@ -1,29 +1,28 @@
-import {CheckoutLayout} from '../checkout-layout';
-import {useParams, useSearchParams} from 'react-router';
-import {loadStripe, PaymentIntent} from '@stripe/stripe-js';
-import {useEffect, useRef, useState} from 'react';
-import {message} from '@ui/i18n/message';
-import {CheckoutProductSummary} from '../checkout-product-summary';
+import { CheckoutLayout } from '../checkout-layout';
+import { useParams, useSearchParams } from 'react-router';
+import { loadStripe, PaymentIntent } from '@stripe/stripe-js';
+import { useEffect, useRef, useState } from 'react';
+import { message } from '@ui/i18n/message';
+import { CheckoutProductSummary } from '../checkout-product-summary';
 import {
   BillingRedirectMessage,
   BillingRedirectMessageConfig,
 } from '../../billing-redirect-message';
-import {useNavigate} from '@common/ui/navigation/use-navigate';
-import {apiClient} from '@common/http/query-client';
-import {useSettings} from '@ui/settings/use-settings';
+import { useNavigate } from '@common/ui/navigation/use-navigate';
+import { apiClient } from '@common/http/query-client';
+import { useSettings } from '@ui/settings/use-settings';
 
 export function CheckoutStripeDone() {
-  const {productId, priceId,type,entryId} = useParams();
+  const { productId, priceId, type, entryId } = useParams();
   const navigate = useNavigate();
   const {
-    billing: {stripe_public_key},
+    billing: { stripe_public_key },
   } = useSettings();
 
   const [params] = useSearchParams();
   const clientSecret = params.get('payment_intent_client_secret');
 
-  const [messageConfig, setMessageConfig] =
-    useState<BillingRedirectMessageConfig>();
+  const [messageConfig, setMessageConfig] = useState<BillingRedirectMessageConfig>();
 
   const stripeInitiated = useRef<boolean>();
 
@@ -36,8 +35,11 @@ export function CheckoutStripeDone() {
       }
 
       const payment = stripe.retrievePaymentIntent(clientSecret)
-      if( type === 'subscription'){
-        payment.then(async ({paymentIntent}) => {
+      
+      console.log(payment);
+
+      if (type === 'subscription') {
+        payment.then(async ({ paymentIntent }) => {
           if (paymentIntent?.status === 'succeeded') {
             await storeSubscriptionDetailsLocally(paymentIntent.id);
             setMessageConfig(
@@ -56,10 +58,10 @@ export function CheckoutStripeDone() {
         });
       }
 
-      if( type === 'order'){
-        payment.then(async ({paymentIntent}) => {
+      if (type === 'order') {
+        payment.then(async ({ paymentIntent }) => {
           if (paymentIntent?.status === 'succeeded') {
-            await storePurchaseDetailsLocally(paymentIntent.id,entryId);
+            await storePurchaseDetailsLocally(paymentIntent.id, entryId);
             setMessageConfig(
               getRedirectMessageConfig('purchased_succeeded', entryId),
             );
@@ -76,7 +78,7 @@ export function CheckoutStripeDone() {
       }
     });
     stripeInitiated.current = true;
-  }, [stripe_public_key, clientSecret, priceId, productId,entryId,type]);
+  }, [stripe_public_key, clientSecret, priceId, productId, entryId, type]);
 
   if (!clientSecret) {
     navigate('/');
@@ -152,7 +154,7 @@ function storeSubscriptionDetailsLocally(paymentIntentId: string) {
   });
 }
 
-function storePurchaseDetailsLocally(paymentIntentId: string,entryId?: string) {
+function storePurchaseDetailsLocally(paymentIntentId: string, entryId?: string) {
   return apiClient.post('billing/stripe/store-purchase-details-locally', {
     payment_intent_id: paymentIntentId,
     entry_id: entryId
