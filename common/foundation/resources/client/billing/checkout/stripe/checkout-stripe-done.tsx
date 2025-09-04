@@ -35,8 +35,6 @@ export function CheckoutStripeDone() {
       }
 
       const payment = stripe.retrievePaymentIntent(clientSecret)
-      
-      console.log(payment);
 
       if (type === 'subscription') {
         payment.then(async ({ paymentIntent }) => {
@@ -60,6 +58,7 @@ export function CheckoutStripeDone() {
 
       if (type === 'order') {
         payment.then(async ({ paymentIntent }) => {
+          console.log(paymentIntent);
           if (paymentIntent?.status === 'succeeded') {
             await storePurchaseDetailsLocally(paymentIntent.id, entryId);
             setMessageConfig(
