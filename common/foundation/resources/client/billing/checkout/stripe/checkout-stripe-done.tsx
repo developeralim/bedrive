@@ -64,7 +64,7 @@ export function CheckoutStripeDone() {
             setMessageConfig(
               getRedirectMessageConfig('purchased_succeeded', entryId),
             );
-            //window.location.href = '/drive/shares';
+            window.location.href = '/drive/shares';
           } else {
             setMessageConfig(
               getRedirectMessageConfig(
@@ -104,7 +104,7 @@ function getRedirectMessageConfig(
         message: message('Subscription successful!'),
         status: 'success',
         buttonLabel: message('Return to site'),
-        link: entryId ? '/drive/shares' : '/billing',
+        link: '/billing',
       };
     case 'processing':
       return {
@@ -127,7 +127,7 @@ function getRedirectMessageConfig(
         message: message('Purchase Completed!'),
         status: 'success',
         buttonLabel: message('Go back'),
-        link: entryId ? '/drive/shares' : '/billing',
+        link: '/drive/shares',
       };
     default:
       return {
