@@ -124,10 +124,10 @@ function getRedirectMessageConfig(
       };
     case 'purchased_succeeded':
       return {
-        message: message('Payment failed. Please try another payment method.'),
-        status: 'error',
+        message: message('Purchase Completed!'),
+        status: 'success',
         buttonLabel: message('Go back'),
-        link: purchaseErrorLink(entryId),
+        link: entryId ? '/drive/shares' : '/billing',
       };
     default:
       return {
