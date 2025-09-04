@@ -97,7 +97,7 @@ class StripeController extends BaseController
             'payment_intent_id' => 'required|string',
             'entry_id'          => 'required|string|exists:file_entries,id'
         ]);
-        
+
         $paymentIntent = $this->stripe->client->paymentIntents->retrieve(
             $data['payment_intent_id'],
         );
@@ -129,7 +129,10 @@ class StripeController extends BaseController
             $txn['amount'] = $price;
             Transaction::create($txn);
 
-            $entry_model->update(['paid' => true]);
+            DB::table('file_entry_models')->find($entry_model->id)?->update([
+                'paid' => true
+            ]);
+            
             $owner->balance += $price;
             $owner->save();
         }
