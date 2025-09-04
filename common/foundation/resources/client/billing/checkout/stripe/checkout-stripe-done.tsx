@@ -13,7 +13,7 @@ import { apiClient } from '@common/http/query-client';
 import { useSettings } from '@ui/settings/use-settings';
 
 export function CheckoutStripeDone() {
-  const { productId, priceId, type, entryId } = useParams();
+  const { productId, priceId, entryId } = useParams();
   const navigate = useNavigate();
   const {
     billing: { stripe_public_key },
@@ -21,7 +21,8 @@ export function CheckoutStripeDone() {
 
   const [params] = useSearchParams();
   const clientSecret = params.get('payment_intent_client_secret');
-
+  const type         = params.get('type');
+  
   const [messageConfig, setMessageConfig] = useState<BillingRedirectMessageConfig>();
 
   const stripeInitiated = useRef<boolean>();
